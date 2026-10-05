@@ -15,6 +15,8 @@ A machine-failure classifier for a milling machine, built on the UCI AI4I 2020 p
 
 An unplanned breakdown is far more expensive than an unnecessary inspection, so the model must catch real failures (**recall**) without raising so many false alarms (**precision**) that the maintenance team stops trusting it. Accuracy is the wrong metric here: predicting "no failure" for every cycle is 96.6% accurate and catches nothing.
 
+![Class imbalance: 96.6% no failure vs 3.4% failure](images/class_imbalance.png)
+
 ## Dataset
 
 | Property | Value |
@@ -57,6 +59,8 @@ These encode interactions a tree ensemble would otherwise have to learn from onl
 
 Confusion matrix (test set, 68 failures): `[[1929, 3], [29, 39]]`, so 3 false alarms and 29 missed failures. Logistic Regression on the same features reached an F1 of only **0.24**, because a linear model cannot capture the torque × speed interaction.
 
+<p align="center"><img src="images/confusion_matrix.png" alt="Baseline confusion matrix" width="420"></p>
+
 ### Final comparison (5-fold stratified CV, threshold 0.5)
 
 | Model | Precision | Recall | F1 | ROC-AUC |
@@ -66,15 +70,21 @@ Confusion matrix (test set, 68 failures): `[[1929, 3], [29, 39]]`, so 3 false al
 
 Recall improved by about 29 points and F1 by about 0.23, far more than the fold-to-fold spread, and precision rose as well.
 
+![5-fold CV comparison: raw features vs engineered features](images/cv_comparison.png)
+
 ### Feature importance (baseline model)
 
 Torque 0.338 · Rotational speed 0.277 · Tool wear 0.209 · Air temperature 0.099 · Process temperature 0.063 · Type 0.014
 
 Torque, speed and tool wear dominate, which is what motivated the interaction features above.
 
+![Baseline Random Forest feature importance](images/feature_importance.png)
+
 ### Threshold tuning
 
 Lowering the decision threshold trades precision for recall. On the engineered model (single split) moving from 0.5 to 0.3 changed F1 only from 0.852 to 0.855, so the default 0.5 is reported. The threshold was explored on the test split, so treat that figure as indicative.
+
+![Baseline threshold trade-off: precision, recall and F1](images/threshold_tradeoff.png)
 
 ## Key takeaways
 
@@ -96,6 +106,7 @@ Lowering the decision threshold trades precision for recall. On the engineered m
 ├── README.md
 ├── requirements.txt
 ├── predictive_maintenance.ipynb   # full analysis notebook (EDA → model → CV)
+├── images/                        # charts used in this README
 ├── docs/
 │   └── AI4I_Predictive_Maintenance.pptx   # project summary slides
 └── ai4i2020.csv                   # download separately (not committed)
