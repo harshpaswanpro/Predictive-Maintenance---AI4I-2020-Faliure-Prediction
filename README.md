@@ -72,6 +72,20 @@ Recall improved by about 29 points and F1 by about 0.23, far more than the fold-
 
 ![5-fold CV comparison: raw features vs engineered features](images/cv_comparison.png)
 
+### Engineered model diagnostics (single 80/20 split)
+
+<p align="center">
+  <img src="images/roc_curve.png" alt="ROC curve, AUC 0.97" width="360">
+  <img src="images/pr_curve.png" alt="Precision-recall curve, AP 0.87" width="360">
+</p>
+
+- **ROC-AUC 0.97:** the model separates failures from normal cycles very well. With only 3.4% positives, ROC can look flattering, so the precision-recall curve is the more telling plot.
+- **Average precision 0.87** (up from 0.81 for the baseline on the same split). Precision stays around 0.95 until recall reaches about 0.8, then drops sharply. The default operating point sits near that knee, which matches the cross-validated recall of 0.80. Pushing recall higher costs precision quickly, consistent with the unpredictable random failures in the data.
+
+![Engineered model: feature importance](images/feature_importance_engineered.png)
+
+Rotational speed (about 0.22) and Power (about 0.19) rank highest, followed by torque and tool wear. The three engineered features together carry roughly 38% of the total importance, with Power the strongest of them. Importance values are approximate (read from the plot), and impurity-based importance is split between correlated features, which is why the raw speed and torque columns still rank high.
+
 ### Feature importance (baseline model)
 
 Torque 0.338 · Rotational speed 0.277 · Tool wear 0.209 · Air temperature 0.099 · Process temperature 0.063 · Type 0.014
